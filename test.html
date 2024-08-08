@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test</title>
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+</head>
+<body>
+    <textarea name="" id="" cols="30" rows="10"></textarea>
+    <button id="testButton">test</button>
+</body>
+
+<script>
+    (() => {
+        const testButton = $("#testButton");
+        const constentsArray = [];
+
+        testButton.on("click", () => {
+            const text = $("textarea");
+            const a = text
+            .val()
+            .split('\n')
+            .filter((v, i) => !/^[\s]+$/.test(v))
+            .map((v, i) => v.split("\t").filter(v => v != ""));
+            
+            console.log(a);
+        });
+    })();
+</script>
+</html>
