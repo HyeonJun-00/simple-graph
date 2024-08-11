@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,13 +8,25 @@
     <title>아동센터 그래프 생성기</title>
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
 </head>
+
 <body>
     <h1> 그래프 생성기 </h1>
     <section class="main_section">
-        <button id="contents_add_button">+</button>
+        <article class="contents_box">
+            <div class="matrix_box">
+                <textarea name="" id="" cols="30" rows="10"></textarea>
+                <button> 적용 </button>
+            </div>
+            <div class="color_box"></div>
+            <div class="graph_box">
+                <canvas class="canvas"></canvas>
+            </div>
+        </article>
+        <!-- <button id="contents_add_button">+</button> -->
     </section>
 </body>
 <script src="graph.js"></script>
 <script>
 </script>
+
 </html>

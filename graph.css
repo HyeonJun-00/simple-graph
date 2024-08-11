@@ -11,6 +11,13 @@ body {
     background-color: #3B3B3B;
 }
 
+textarea {
+    font-size: 1.2rem;
+    margin-top: 3rem;
+    width: 90%;
+    height: 84%;
+}
+
 h1 {
     color: #fff;
     font-size: 3.2rem;
@@ -133,9 +140,10 @@ button:hover {
 
 /***** graph start *****/
 .graph_box {
+    overflow: scroll;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
     width: 90rem;
 }
 /***** graph end *****/

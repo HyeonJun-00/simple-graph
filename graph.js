@@ -1,8 +1,3 @@
-const a = (() => {
-    let count = -1;
-    return () => ++count;
-})();
-
 class Greaph {
     constructor(index) {
         this.index = index;
@@ -10,149 +5,100 @@ class Greaph {
         this.column = 0;
         this.canvasSize = 500;
         this.columnNameArray = [];
+        this.resultArrary = [];
     }
 
-    createContentsBox() {
-        const addButton = $("#contents_add_button");
+    paseArray(orginArray) {
+        this.resultArrary = [];
+        let count = 0;
 
-        addButton.before(
-        `<article class="contents_box">
-            <div class="matrix_box">
-                <div class="row_column_box">
-                    <div class="row_box">
-                        <p>답변</p>
-                        <input type="number" placeholder="">
-                    </div>
-                    <div class="column_box">
-                        <p>그래프</p>
-                        <input type="number" placeholder="">
-                    </div>
-                    <div class="button_box">
-                        <p>표 생성</p>
-                        <button class="create_button">생성</button>
-                    </div>
-                </div>
-                <div class="matrix">
-                </div>
-                <button> 적용 </button>
-            </div>
-            <div class="color_box"></div>
-            <div class="graph_box">
-                <canvas class="canvas"></canvas>
-            </div>
-        </article>`
-        );
-
-        $($(".create_button")[this.index]).on("click", () => {
-            this.createMatrix();
-        });
-        $($(".matrix_box > button")[this.index]).on("click", () => {
-            this.createGreph();
-        });
-        $($(".row_box > input")[this.index]).change((v) => {
-            this.row = $($(".row_box > input")[this.index]).val();
-        });
-        $($(".column_box > input")[this.index]).change((v) => {
-            this.column = $($(".column_box > input")[this.index]).val();
-        });
-
-
-    }
-
-    createMatrix() {
-        const matrix = $($(".matrix")[this.index]);
-        let matrixString = "";
-
-        for (let i = 0; i <= this.column; i++) {
-            matrixString += "<div>";
-
-            for (let j = 0; j <= this.row; j++) {
-                if (j == 0) {
-                    matrixString += `<p>${i == 0 ? "" : i + "번"}</p>`;
-                } else {
-                    if (i == 0) {
-                        matrixString += "<input type='text' placeholder='답변'/>";
-                    } else {
-                        matrixString += "<input type='number'/>";
-                    }
-                }
+        for (let i = 0; i < orginArray.length; i++) {
+            if (/문항/.test(orginArray[i][0])) {
+                this.resultArrary[count] = {
+                    name: orginArray[i][1],
+                    tag: orginArray[i + 1].map((v, j) => [v, orginArray[i + 2][j]])
+                };
+                count++;
             }
-            matrixString += "</div>";
         }
-        matrix.html(matrixString);
-        for (let i = 0; i < this.row; i++) {
-            $($(matrix.children("div")[0]).children("input")[i]).change((v) => {
-                this.columnNameArray[i] = $($(matrix.children("div")[0]).children("input")[i]).val();
-            });
-        }
-
+        this.createGreph();
     }
 
     createGreph() {
-        const canvas = $('.canvas')[this.index];
-        const ct = canvas.getContext('2d');
-        const colorArray = ['#00ff00', '#0000ff', '#ff0000', '#ffdd66', '#dd66ff', "#ff00ff", "#00ffff"];
-        const matrixArray = $($(".matrix")[this.index]).children("div");
-        
-        canvas.width = this.canvasSize;
-        canvas.height = this.canvasSize;
+        this.resultArrary.forEach((v, i) => {
+            $(".graph_box").append(`<canvas class="canvas"></canvas>`);
+            const canvas = $('.canvas')[i];
+            const ct = canvas.getContext('2d');
+            const colorArray = ['#00ff00', '#0000ff', '#ff0000', '#ffdd66', '#dd66ff', "#ff00ff", "#00ffff"];
 
-        let center_x = this.canvasSize / 2;
-        let center_y = this.canvasSize / 2;
+            canvas.width = this.canvasSize + 200;
+            canvas.height = this.canvasSize;
 
-        let start = 0;
-        let end = 0;
+            let center_x = this.canvasSize / 2 + 100;
+            let center_y = this.canvasSize / 2;
 
-        if (canvas.getContext) {
-            ct.clearRect(0, 0, this.canvasSize, this.canvasSize);
-            ct.font = 'bold 15px/15px Sans-Serif';
-            const inputDataArray = [];
-            let sumNumbers = 0;
+            let start = 0;
+            let end = 0;
 
-            for(let i = 1; i < matrixArray.length; i++) {
-                const input = $(matrixArray[i]).children("input");
+            if (canvas.getContext) {
+                let sumNumbers = 0;
 
-                for (let j = 0; j < this.columnNameArray.length; j++) {
-                    let inputData = Number($(input[j]).val());
-                    
-                    sumNumbers += inputData;
-                    inputDataArray.push(inputData);
+                ct.textAlign = "start"
+                ct.clearRect(0, 0, this.canvasSize, this.canvasSize);
+                ct.font = 'bold 15px/15px Sans-Serif';
+
+
+                for (let j = 0; j < v["tag"].length; j++) {
+                    sumNumbers += v["tag"][j][1] != undefined ? Number(v["tag"][j][1]) : 0;
                 }
-            }
 
-            for (let i = 0; i < this.columnNameArray.length; i++) {
-                end += inputDataArray[i] / sumNumbers  * 360;
+                for (let j = 0; j < v["tag"].length; j++) {
+                    let inputData = v["tag"][j][1] != undefined ? v["tag"][j][1] : 0;
+                    end += inputData / sumNumbers * 360;
 
-                ct.fillStyle = colorArray[i];
-                ct.beginPath();
-                ct.moveTo(center_x, center_y);
-                ct.arc(center_x, center_y, center_y - 50, start * Math.PI / 180, end * Math.PI / 180, false);
+                    ct.fillStyle = colorArray[j];
+                    ct.beginPath();
+                    ct.moveTo(center_x, center_y);
+                    ct.arc(center_x, center_y, center_y - 50, start * Math.PI / 180, end * Math.PI / 180, false);
 
-                ct.closePath();
+                    ct.closePath();
+                    ct.fill();
+
+                    ct.fillRect(10, this.canvasSize - 30 - 16 * j, 10, 10);
+
+                    ct.fillStyle = '#000';
+                    if ((inputData / sumNumbers * 100).toFixed(2) != 0)
+                        ct.fillText((inputData / sumNumbers * 100).toFixed(2) + "%", center_x - 12 + 160 * Math.cos((start + (end - start) / 2) * Math.PI / 180), center_y + 6 + 160 * Math.sin((start + (end - start) / 2) * Math.PI / 180));
+                    ct.fillText(v["tag"][j][0], 25, this.canvasSize - 20 - 16 * j);
+
+                    start = end;
+                }
+                ct.textAlign = "center"
+
+                ct.font = 'bold 20px/15px Sans-Serif';
+                ct.fillText(v["name"], center_x, 30);
                 ct.fill();
-
-                ct.fillRect(10, this.canvasSize - 70 - 16 * i, 10, 10);
-
-                ct.fillStyle = '#000';
-                ct.fillText((inputDataArray[i] / sumNumbers  * 100).toFixed(2) + "%", center_x - 12 + 160 * Math.cos((start + (end - start)/2) * Math.PI / 180), center_y + 6 + 160 * Math.sin((start + (end - start)/2) * Math.PI / 180));
-                ct.fillText(this.columnNameArray[i], 25, this.canvasSize - 60 - 16 * i);
-                console.log(end, start);
-                
-                start = end;
-
             }
-        }
+        });
+
     }
 }
 
 (() => {
-    const greaph = [];
-    const addButton = $("#contents_add_button");
+    const greaph = new Greaph(0);
 
-    addButton.on("click", () => {
-        const newIndex = a();
+    const testButton = $(".matrix_box > button");
 
-        greaph[newIndex] = new Greaph(newIndex);
-        greaph[newIndex].createContentsBox();
+    testButton.on("click", () => {
+        const text = $("textarea");
+        aa = text
+            .val()
+            .split('\n')
+            .filter(v => !/^[\s]+$/.test(v))
+            .map(v => v.split("\t").filter(v => v != ""))
+            .filter(v => v.length !== 0);
+
+        greaph.paseArray(aa);
+        // greaph.createContentsBox();
     });
 })();
